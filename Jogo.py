@@ -34,7 +34,7 @@ while running:
         game.update(dt, screen, clock)
     else:
         titleScreen.draw(screen)
-        titleScreen.uptade()
+        titleScreen.update()
 
     # get the time since last frame in seconds
     dt = clock.tick(60) / 1000
