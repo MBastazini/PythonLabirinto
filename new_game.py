@@ -3,13 +3,15 @@ from player import Player
 import pygame 
 
 class NewGame:
-    def __init__ (self, SCREEN_WIDTH, SCREEN_HEIGHT):
-        self.matriz = newMaze(21)
+    def __init__ (self, SCREEN_WIDTH, SCREEN_HEIGHT, level_difficulty):
+        self.matriz = newMaze(23 + (
+            level_difficulty * 4 * 3  # Increase maze size based on difficulty
+        )) #multiplos de 4 mais 3.
 
         self.classWallList = []
         WALL_SIZE = 100  # Tamanho do bloco da parede
         # draw walls based on the matrix
-        #Tamanho usando ocupando a tela inteira
+        #Tamanho usando ocupando a tela inteira 
         #wall_width = SCREEN_WIDTH // len(matriz[0])
         #wall_height = SCREEN_HEIGHT // len(matriz)
         wall_width = WALL_SIZE

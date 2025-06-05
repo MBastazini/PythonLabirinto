@@ -1,7 +1,7 @@
 # Example file showing a circle moving on screen
 from maze import Wall, newMaze
 from player import Player
-from title_screen import TitleScreen
+from screens import TitleScreen, LevelSelector
 from new_game import NewGame as Mode1NewGame, userInput
 import pygame
 
@@ -15,26 +15,36 @@ clock = pygame.time.Clock()
 running = True
 dt = 0
 
-game = Mode1NewGame(SCREEN_WIDTH, SCREEN_HEIGHT)
+game = None  # Initialize game variable
 titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+levelSelector = LevelSelector(SCREEN_WIDTH, SCREEN_HEIGHT)
 
+activeScreen = "title"  # Track which screen is active
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == pygame.QUIT:
             running = False
 
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("white")
 
-    # draw maze walls
-
-    if titleScreen.startGame:
-        game.update(dt, screen, clock)
-    else:
-        titleScreen.draw(screen)
-        titleScreen.update()
+    match activeScreen:
+        case "title":
+            titleScreen.update(screen, events)
+            if titleScreen.startGame:
+                activeScreen = "level_selector"
+        case "level_selector":
+            levelSelector.update(screen, events)
+            if levelSelector.startGame:
+                game = Mode1NewGame(SCREEN_WIDTH, SCREEN_HEIGHT, levelSelector.difficulty)
+                activeScreen = "game"
+        case "game":
+            game.update(dt, screen, clock)
+            if pygame.key.get_pressed()[pygame.K_ESCAPE]:  # Press ESC to return to title screen
+                activeScreen = "title"
 
     # get the time since last frame in seconds
     dt = clock.tick(60) / 1000
