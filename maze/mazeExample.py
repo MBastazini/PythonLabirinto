@@ -69,7 +69,7 @@ def geraLabirintoRecursivoVisual(matriz, x, y, player, cell_width, cell_height):
         desenhe_labirinto(matriz, cell_width, cell_height)
         desenhe_player(player)
         pygame.display.flip()
-        pygame.time.delay(100)  # espera de 100ms para visualizar
+        pygame.time.delay(10)  # espera de 100ms para visualizar
 
         if 1 <= nx < len(matriz) - 1 and 1 <= ny < len(matriz) - 1:
             if matriz[ny][nx] == 1:
@@ -78,7 +78,7 @@ def geraLabirintoRecursivoVisual(matriz, x, y, player, cell_width, cell_height):
                 geraLabirintoRecursivoVisual(matriz, nx, ny, player, cell_width, cell_height)
 
 # Inicialização
-tamanho = 21
+tamanho = 51
 matriz = criaMatrizVazia(tamanho)
 start_x, start_y = 1, 1
 matriz[start_y][start_x] = 0

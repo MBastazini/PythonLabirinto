@@ -28,31 +28,10 @@ while running:
 
     # draw maze walls
 
-    speed = 300 * dt
-
-    delta = userInput(speed)
-    dx, dy = delta[0], delta[1]
-
-    #Check for collisions with walls
-    is_colliding = game.checkCollision(dx, dy)
-    for wall in game.classWallList:
-        wall.rect.x -= dx * (1-is_colliding[0])
-        wall.rect.y -= dy * (1-is_colliding[1])
-
-    #Draw the maze walls
-    for i, wall in enumerate(game.classWallList):
-        pygame.draw.rect(screen, wall.color, wall.rect)
-    keys = pygame.key.get_pressed()
-
-    # draw the player as a circle
-    game.player.draw(screen)
-
+    game.update(dt, screen, clock)
+    # get the time since last frame in seconds
+    dt = clock.tick(60) / 1000
     # flip() the display to put your work on screen
     pygame.display.flip()
-
-    # limits FPS to 60
-    # dt is delta time in seconds since last frame, used for framerate-
-    # independent physics.
-    dt = clock.tick(60) / 1000
 
 pygame.quit()

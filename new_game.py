@@ -40,6 +40,25 @@ class NewGame:
         is_colliding[0] = playerPosHitbox_x.collidelist(mazeHitbox) != -1
         is_colliding[1] = playerPosHitbox_y.collidelist(mazeHitbox) != -1
         return is_colliding
+    def update(self, dt, screen, clock):
+        speed = 300 * dt
+
+        delta = userInput(speed)
+        dx, dy = delta[0], delta[1]
+
+        #Check for collisions with walls
+        is_colliding = self.checkCollision(dx, dy)
+        for wall in self.classWallList:
+            wall.rect.x -= dx * (1-is_colliding[0])
+            wall.rect.y -= dy * (1-is_colliding[1])
+
+        #Draw the maze walls
+        for i, wall in enumerate(self.classWallList):
+            pygame.draw.rect(screen, wall.color, wall.rect)
+        keys = pygame.key.get_pressed()
+
+        # draw the player as a circle
+        self.player.draw(screen)
 
 def userInput(speed=1):
     """
