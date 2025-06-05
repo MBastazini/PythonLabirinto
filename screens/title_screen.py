@@ -19,10 +19,18 @@ class TitleScreen:
             text_color=(28, 77, 5),
             background_color=False  # no background
         )
-        self.bPlay = Button((200, 50), (self.screen_width // 2 - 100, self.screen_height // 2 + padding_top), 
-                            (255, 255, 255), (200, 255, 200), "Play", self.start_game)
-        self.bScores = Button((200, 50), (self.screen_width // 2 - 100, self.screen_height // 2 + padding_top + padding + self.bPlay.size[1]), 
-                              (255, 255, 255), (200, 255, 200), "Scores", self.show_scores)
+        self.bPlay = Button(
+            text="Play",
+            size=(200, 50),
+            position=(self.screen_width // 2 - 100, self.screen_height // 2 + padding_top),
+            onClick=self.start_game
+        )
+        self.bScores = Button(
+            text="Scores",
+            size=(200, 50),
+            position=(self.screen_width // 2 - 100, self.screen_height // 2 + padding_top + padding + self.bPlay.size[1]),
+            onClick=self.show_scores
+        )
 
     def draw(self, screen):
         screen.fill(self.background_color)

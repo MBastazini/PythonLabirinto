@@ -20,8 +20,12 @@ class LevelSelector:
         )
 
         self.level_buttons = [
-            Button((200, 50), (self.screen_width // 2 - 100, self.screen_height // 2 - 100 + i * 60), 
-                   (255, 255, 255), (200, 255, 200), str(i), lambda i=i: self.level_selected(i))
+            Button(
+                text=str(i),
+                size=(200, 50),
+                position=(self.screen_width // 2 - 100, self.screen_height // 2 - 100 + i * 60),
+                onClick=lambda i=i: self.level_selected(i)
+            )
             for i in range(1, 4)
         ]
 

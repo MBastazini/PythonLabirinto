@@ -42,7 +42,7 @@ while running:
                 game = Mode1NewGame(SCREEN_WIDTH, SCREEN_HEIGHT, levelSelector.difficulty)
                 activeScreen = "game"
         case "game":
-            game.update(dt, screen, clock)
+            game.update(dt, screen, events)
             if pygame.key.get_pressed()[pygame.K_ESCAPE]:  # Press ESC to return to title screen
                 activeScreen = "title"
 

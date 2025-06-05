@@ -2,7 +2,7 @@ from .text_box import TextBox
 import pygame
 
 class Button:
-    def __init__(self, size, position, color, color_hover, text: str, onClick: callable):
+    def __init__(self, text: str, size, position, onClick: callable, color=(255, 255, 255), color_hover=(200, 200, 200)):
         self.size = (size[0], size[1])
         self.position = position
         self.color_default = color

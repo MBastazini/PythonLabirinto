@@ -1,0 +1,54 @@
+import pygame
+from util import Button, TextBox
+
+class PauseMenu:
+    def __init__(self, screen_width, screen_height):
+        self.screen = pygame.Surface((screen_width, screen_height))
+        self.screen_width, self.screen_height = self.screen.get_size()
+
+        #semi-transparent background
+        #self.background_color = (126, 217, 81)
+        self.background_color = (126, 217, 81, 128)  # RGBA for semi-transparency
+        self.text_color = (28, 77, 5)
+        self.screen.fill(self.background_color)
+        self.text_box_size = (200, 50)
+        self.text_box_position = (self.screen_width // 2 - self.text_box_size[0] // 2, 
+                                  self.screen_height // 2 - self.text_box_size[1] // 2)
+        self.text_box = TextBox(
+            text="Paused", 
+            position=self.text_box_position, 
+            size=self.text_box_size, 
+            text_color=self.text_color, 
+            background_color=False, 
+            font=2)
+        # '*' symbol expands the tuple into positional arguments
+        self.resume_button = None
+        self.quit_button = None
+        self.create_buttons()
+
+    def create_buttons(self):
+        self.resume_button = Button(
+            text="Resume", 
+            onClick=self.resume_game,
+            size=(200, 50),
+            position=(self.screen_width // 2 - 100, self.screen_height // 2 + 60)
+        )
+        self.quit_button = Button(
+            text="Quit", 
+            onClick=self.quit_game,
+            size=(200, 50),
+            position=(self.screen_width // 2 - 100, self.screen_height // 2 + 120)
+        )
+
+    def resume_game(self):
+        print("Resuming game...")
+        # Logic to resume the game
+
+    def quit_game(self):
+        print("Quitting game...")
+        # Logic to quit the game
+
+    def draw(self):
+        self.text_box.draw(self.screen)
+        self.resume_button.draw(self.screen)
+        self.quit_button.draw(self.screen)

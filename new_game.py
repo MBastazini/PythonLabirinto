@@ -1,37 +1,18 @@
-from maze import Wall, newMaze
+from maze import Wall, newMaze, generateWallList, getMazeInfo
 from player import Player
+from screens import PauseMenu
 import pygame 
 
 class NewGame:
     def __init__ (self, SCREEN_WIDTH, SCREEN_HEIGHT, level_difficulty):
-        self.matriz = newMaze(23 + (
-            level_difficulty * 4 * 3  # Increase maze size based on difficulty
-        )) #multiplos de 4 mais 3.
-
-        self.classWallList = []
-        WALL_SIZE = 100  # Tamanho do bloco da parede
-        # draw walls based on the matrix
-        #Tamanho usando ocupando a tela inteira 
-        #wall_width = SCREEN_WIDTH // len(matriz[0])
-        #wall_height = SCREEN_HEIGHT // len(matriz)
-        wall_width = WALL_SIZE
-        wall_height = WALL_SIZE
-        for y, row in enumerate(self.matriz):
-            for x, cell in enumerate(row):
-                if cell == 1:
-                    wall = Wall(x * wall_width, y * wall_height, wall_width, wall_height)
-                    self.classWallList.append(wall)
-                if cell == 2:
-                    # If the cell is the starting point, draw it as a wall
-                    wall = Wall(x * wall_width, y * wall_height, wall_width, wall_height, color="green", active=False)
-                    self.classWallList.append(wall)
-
+        self.classWallList = generateWallList(level_difficulty, SCREEN_WIDTH, SCREEN_HEIGHT)
+        options = getMazeInfo()
         # Initialize player
-        self.player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, min(wall_width, wall_height) // 3)
+        self.player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, min(options["wall_size"], options["wall_size"]) // 3)
+        self.isPaused = False
+        self.pauseMenu = PauseMenu(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-        for wall in self.classWallList:
-            wall.rect.x -= (WALL_SIZE * len(self.matriz[0])) // 2 - SCREEN_WIDTH // 2
-            wall.rect.y -= (WALL_SIZE * len(self.matriz)) // 2 - SCREEN_HEIGHT // 2
+        
     def checkCollision(self, dx, dy):
         is_colliding = [False, False] #Eixo X e Y
         # Check for collisions with walls
@@ -42,7 +23,30 @@ class NewGame:
         is_colliding[0] = playerPosHitbox_x.collidelist(mazeHitbox) != -1
         is_colliding[1] = playerPosHitbox_y.collidelist(mazeHitbox) != -1
         return is_colliding
-    def update(self, dt, screen, clock):
+    
+    def update(self, dt, screen, events):
+
+        
+    
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.isPaused = not self.isPaused
+        #if event.key == pygame.K_r:
+        # Reset player position to the center of the screen
+            #self.player.move_to_cell(len(self.classWallList[0].rect) // 2, len(self.classWallList) // 2, self.classWallList[0].rect.width, self.classWallList[0].rect.height)
+        # Calculate speed based on delta time
+
+        if self.isPaused:
+            self.pauseMenu.draw()
+            return
+    
+
+        if dt == 0:
+            dt = 1 / 60 # Prevent division by zero
+        if dt > 1:
+            dt = 1 / 60 # Prevent dt from being too large
+        # Speed is 300 pixels per second
         speed = 300 * dt
 
         delta = userInput(speed)
