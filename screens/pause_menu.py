@@ -23,10 +23,12 @@ class PauseMenu:
             font=2)
         # '*' symbol expands the tuple into positional arguments
         self.resume_button = None
+        self.return_button = None
         self.quit_button = None
         self.create_buttons()
 
         self.isPaused = False
+        self.events = []
     def create_buttons(self):
         self.resume_button = Button(
             text="Resume", 
@@ -34,11 +36,17 @@ class PauseMenu:
             size=(200, 50),
             position=(self.screen_width // 2 - 100, self.screen_height // 2 + 60)
         )
+        self.return_button = Button(
+            text="Return to Menu", 
+            onClick=self.return_to_menu,
+            size=(200, 50),
+            position=(self.screen_width // 2 - 100, self.screen_height // 2 + 120)
+        )
         self.quit_button = Button(
             text="Quit", 
             onClick=self.quit_game,
             size=(200, 50),
-            position=(self.screen_width // 2 - 100, self.screen_height // 2 + 120)
+            position=(self.screen_width // 2 - 100, self.screen_height // 2 + 180)
         )
 
     def resume_game(self):
@@ -48,8 +56,21 @@ class PauseMenu:
         pygame.quit()
         exit()
 
+    def return_to_menu(self):
+        self.events.append('return_to_menu')
+
     def draw(self, screen):
         self.text_box.draw(self.screen)
         self.resume_button.draw(self.screen)
+        self.return_button.draw(self.screen)
         self.quit_button.draw(self.screen)
         screen.blit(self.screen, (0, 0))
+
+    def update(self, screen, events):
+        if self.isPaused:
+            self.resume_button.update(events)
+            self.return_button.update(events)
+            self.quit_button.update(events)
+            self.draw(screen)
+        
+        return self.events

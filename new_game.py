@@ -11,6 +11,9 @@ class NewGame:
         self.player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, min(options["wall_size"], options["wall_size"]) // 3)
         self.pauseMenu = PauseMenu(SCREEN_WIDTH, SCREEN_HEIGHT)
 
+        self.active = True  # Track if the game is active
+        #Goes back to main menu if false
+
         
     def checkCollision(self, dx, dy):
         is_colliding = [False, False] #Eixo X e Y
@@ -26,7 +29,7 @@ class NewGame:
     def update(self, dt, screen, events):
 
         
-    
+        
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -63,7 +66,10 @@ class NewGame:
 
         if self.pauseMenu.isPaused:
             self.pauseMenu.draw(screen)
-
+            events = self.pauseMenu.update(screen, events)
+            #events is a dictionary, shows all the items inside:
+            if "return_to_menu" in events:
+                self.active = False
 def userInput(speed=1):
     """
     Function to handle user input for moving the player.

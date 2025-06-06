@@ -45,6 +45,9 @@ while running:
                 levelSelector.startGame = False
         case "game":
             game.update(dt, screen, events)
+            if not game.active:
+                activeScreen = "title"
+                del game
             #if pygame.key.get_pressed()[pygame.K_ESCAPE]:  # Press ESC to return to title screen
             #    activeScreen = "title"
 
