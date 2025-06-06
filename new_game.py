@@ -9,7 +9,6 @@ class NewGame:
         options = getMazeInfo()
         # Initialize player
         self.player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, min(options["wall_size"], options["wall_size"]) // 3)
-        self.isPaused = False
         self.pauseMenu = PauseMenu(SCREEN_WIDTH, SCREEN_HEIGHT)
 
         
@@ -31,32 +30,28 @@ class NewGame:
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.isPaused = not self.isPaused
+                    self.pauseMenu.isPaused = not self.pauseMenu.isPaused
         #if event.key == pygame.K_r:
         # Reset player position to the center of the screen
             #self.player.move_to_cell(len(self.classWallList[0].rect) // 2, len(self.classWallList) // 2, self.classWallList[0].rect.width, self.classWallList[0].rect.height)
         # Calculate speed based on delta time
 
-        if self.isPaused:
-            self.pauseMenu.draw()
-            return
-    
+        if not self.pauseMenu.isPaused:
+            if dt == 0:
+                dt = 1 / 60 # Prevent division by zero
+            if dt > 1:
+                dt = 1 / 60 # Prevent dt from being too large
+            # Speed is 300 pixels per second
+            speed = 300 * dt
 
-        if dt == 0:
-            dt = 1 / 60 # Prevent division by zero
-        if dt > 1:
-            dt = 1 / 60 # Prevent dt from being too large
-        # Speed is 300 pixels per second
-        speed = 300 * dt
+            delta = userInput(speed)
+            dx, dy = delta[0], delta[1]
 
-        delta = userInput(speed)
-        dx, dy = delta[0], delta[1]
-
-        #Check for collisions with walls
-        is_colliding = self.checkCollision(dx, dy)
-        for wall in self.classWallList:
-            wall.rect.x -= dx * (1-is_colliding[0])
-            wall.rect.y -= dy * (1-is_colliding[1])
+            #Check for collisions with walls
+            is_colliding = self.checkCollision(dx, dy)
+            for wall in self.classWallList:
+                wall.rect.x -= dx * (1-is_colliding[0])
+                wall.rect.y -= dy * (1-is_colliding[1])
 
         #Draw the maze walls
         for i, wall in enumerate(self.classWallList):
@@ -65,6 +60,9 @@ class NewGame:
 
         # draw the player as a circle
         self.player.draw(screen)
+
+        if self.pauseMenu.isPaused:
+            self.pauseMenu.draw(screen)
 
 def userInput(speed=1):
     """

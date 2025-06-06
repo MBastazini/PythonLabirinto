@@ -36,15 +36,17 @@ while running:
             titleScreen.update(screen, events)
             if titleScreen.startGame:
                 activeScreen = "level_selector"
+                titleScreen.startGame = False
         case "level_selector":
             levelSelector.update(screen, events)
             if levelSelector.startGame:
                 game = Mode1NewGame(SCREEN_WIDTH, SCREEN_HEIGHT, levelSelector.difficulty)
                 activeScreen = "game"
+                levelSelector.startGame = False
         case "game":
             game.update(dt, screen, events)
-            if pygame.key.get_pressed()[pygame.K_ESCAPE]:  # Press ESC to return to title screen
-                activeScreen = "title"
+            #if pygame.key.get_pressed()[pygame.K_ESCAPE]:  # Press ESC to return to title screen
+            #    activeScreen = "title"
 
     # get the time since last frame in seconds
     dt = clock.tick(60) / 1000

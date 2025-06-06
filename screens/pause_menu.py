@@ -3,7 +3,7 @@ from util import Button, TextBox
 
 class PauseMenu:
     def __init__(self, screen_width, screen_height):
-        self.screen = pygame.Surface((screen_width, screen_height))
+        self.screen = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)  # Create a surface with alpha for transparency
         self.screen_width, self.screen_height = self.screen.get_size()
 
         #semi-transparent background
@@ -13,19 +13,20 @@ class PauseMenu:
         self.screen.fill(self.background_color)
         self.text_box_size = (200, 50)
         self.text_box_position = (self.screen_width // 2 - self.text_box_size[0] // 2, 
-                                  self.screen_height // 2 - self.text_box_size[1] // 2)
+                                  50)
         self.text_box = TextBox(
             text="Paused", 
             position=self.text_box_position, 
             size=self.text_box_size, 
             text_color=self.text_color, 
-            background_color=False, 
+            background_color=(126, 217, 81), 
             font=2)
         # '*' symbol expands the tuple into positional arguments
         self.resume_button = None
         self.quit_button = None
         self.create_buttons()
 
+        self.isPaused = False
     def create_buttons(self):
         self.resume_button = Button(
             text="Resume", 
@@ -41,14 +42,14 @@ class PauseMenu:
         )
 
     def resume_game(self):
-        print("Resuming game...")
-        # Logic to resume the game
+        self.isPaused = False
 
     def quit_game(self):
-        print("Quitting game...")
-        # Logic to quit the game
+        pygame.quit()
+        exit()
 
-    def draw(self):
+    def draw(self, screen):
         self.text_box.draw(self.screen)
         self.resume_button.draw(self.screen)
         self.quit_button.draw(self.screen)
+        screen.blit(self.screen, (0, 0))
