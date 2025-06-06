@@ -6,7 +6,7 @@ class TitleScreen:
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.background_color = (126, 217, 81)
-        self.startGame = False
+        self.nextScreen = None
 
         padding_top = 30
         padding = 30
@@ -48,7 +48,7 @@ class TitleScreen:
         self.draw(screen)
 
     def start_game(self):
-        self.startGame = True
+        self.nextScreen = 'level_selector'
     
     def show_scores(self):
-        print("Show scores clicked")
+        self.nextScreen = 'scores'

@@ -3,6 +3,8 @@ from player import Player
 from screens import PauseMenu
 import pygame 
 
+SPEED = 300  # Speed in pixels per second
+
 class NewGame:
     def __init__ (self, SCREEN_WIDTH, SCREEN_HEIGHT, level_difficulty):
         self.classWallList = generateWallList(level_difficulty, SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -11,8 +13,7 @@ class NewGame:
         self.player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, min(options["wall_size"], options["wall_size"]) // 3)
         self.pauseMenu = PauseMenu(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-        self.active = True  # Track if the game is active
-        #Goes back to main menu if false
+        self.nextScreen = None  # Track next screen to switch to
 
         
     def checkCollision(self, dx, dy):
@@ -45,7 +46,7 @@ class NewGame:
             if dt > 1:
                 dt = 1 / 60 # Prevent dt from being too large
             # Speed is 300 pixels per second
-            speed = 300 * dt
+            speed = SPEED * dt
 
             delta = userInput(speed)
             dx, dy = delta[0], delta[1]
@@ -69,7 +70,7 @@ class NewGame:
             events = self.pauseMenu.update(screen, events)
             #events is a dictionary, shows all the items inside:
             if "return_to_menu" in events:
-                self.active = False
+                self.nextScreen = 'title'
 def userInput(speed=1):
     """
     Function to handle user input for moving the player.

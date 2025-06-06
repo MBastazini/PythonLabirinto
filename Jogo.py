@@ -1,7 +1,7 @@
 # Example file showing a circle moving on screen
 from maze import Wall, newMaze
 from player import Player
-from screens import TitleScreen, LevelSelector
+from screens import TitleScreen, LevelSelector, ScoresScreen
 from new_game import NewGame as Mode1NewGame, userInput
 import pygame
 
@@ -18,6 +18,7 @@ dt = 0
 game = None  # Initialize game variable
 titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 levelSelector = LevelSelector(SCREEN_WIDTH, SCREEN_HEIGHT)
+scoresScreen = ScoresScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 
 activeScreen = "title"  # Track which screen is active
 while running:
@@ -34,20 +35,22 @@ while running:
     match activeScreen:
         case "title":
             titleScreen.update(screen, events)
-            if titleScreen.startGame:
-                activeScreen = "level_selector"
-                titleScreen.startGame = False
+            if titleScreen.nextScreen:
+                activeScreen = titleScreen.nextScreen
+                titleScreen.nextScreen = None
         case "level_selector":
             levelSelector.update(screen, events)
             if levelSelector.startGame:
                 game = Mode1NewGame(SCREEN_WIDTH, SCREEN_HEIGHT, levelSelector.difficulty)
                 activeScreen = "game"
                 levelSelector.startGame = False
+        case "scores":
+            scoresScreen.update(screen, events)
         case "game":
             game.update(dt, screen, events)
-            if not game.active:
-                activeScreen = "title"
-                del game
+            if game.nextScreen:
+                activeScreen = game.nextScreen
+                game = None
             #if pygame.key.get_pressed()[pygame.K_ESCAPE]:  # Press ESC to return to title screen
             #    activeScreen = "title"
 
