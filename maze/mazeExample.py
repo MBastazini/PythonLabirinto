@@ -48,6 +48,14 @@ def desenhe_labirinto(matriz, cell_width, cell_height):
             if cell == 1:
                 rect = pygame.Rect(x * cell_width, y * cell_height, cell_width, cell_height)
                 pygame.draw.rect(screen, WALL_COLOR, rect)
+            if cell == 2:
+                # Desenha a saída do labirinto
+                rect = pygame.Rect(x * cell_width, y * cell_height, cell_width, cell_height)
+                pygame.draw.rect(screen, "green", rect)
+            if cell == 3:
+                # Desenha o caminho da saída
+                rect = pygame.Rect(x * cell_width, y * cell_height, cell_width, cell_height)
+                pygame.draw.rect(screen, "yellow", rect)
 
 # Função para desenhar o player
 def desenhe_player(player):
@@ -57,7 +65,7 @@ def desenhe_player(player):
 def geraLabirintoRecursivoVisual(matriz, x, y, player, cell_width, cell_height):
     direcoes = [(0, -2), (0, 2), (-2, 0), (2, 0)]  # cima, baixo, esquerda, direita
     random.shuffle(direcoes)
-
+    count = 0
     for dx, dy in direcoes:
         nx, ny = x + dx, y + dy
 
@@ -69,19 +77,24 @@ def geraLabirintoRecursivoVisual(matriz, x, y, player, cell_width, cell_height):
         desenhe_labirinto(matriz, cell_width, cell_height)
         desenhe_player(player)
         pygame.display.flip()
-        pygame.time.delay(10)  # espera de 100ms para visualizar
+        #pygame.time.delay(10)  # espera de 100ms para visualizar
 
         if 1 <= nx < len(matriz) - 1 and 1 <= ny < len(matriz) - 1:
             if matriz[ny][nx] == 1:
                 matriz[y + dy // 2][x + dx // 2] = 0
                 matriz[ny][nx] = 0
                 geraLabirintoRecursivoVisual(matriz, nx, ny, player, cell_width, cell_height)
-
+            else:
+                count += 1
+        else:
+            count += 1
+    if (count == 4):
+        matriz[y][x] = 3
 # Inicialização
 tamanho = 51
 matriz = criaMatrizVazia(tamanho)
-start_x, start_y = 1, 1
-matriz[start_y][start_x] = 0
+start_x, start_y = 26, 26  # Começa no centro da matriz
+matriz[start_y][start_x] = 2
 
 cell_width = SCREEN_WIDTH // tamanho
 cell_height = SCREEN_HEIGHT // tamanho

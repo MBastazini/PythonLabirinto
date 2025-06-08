@@ -1,44 +1,66 @@
 from maze import Wall, newMaze, generateWallList, getMazeInfo
 from player import Player
 from screens import PauseMenu
+from util import TextBox
 import pygame 
 
-SPEED = 300  # Speed in pixels per second
+SPEED = 501 # Speed in pixels per second
+
+pygame.time.set_timer(pygame.USEREVENT, 100)
 
 class NewGame:
-    def __init__ (self, SCREEN_WIDTH, SCREEN_HEIGHT, level_difficulty):
-        self.classWallList = generateWallList(level_difficulty, SCREEN_WIDTH, SCREEN_HEIGHT)
-        options = getMazeInfo()
+    def __init__ (self, SCREEN_WIDTH, SCREEN_HEIGHT, level_difficulty, DEBUG_MODE=False):
+        self.classWallList = generateWallList(level_difficulty, SCREEN_WIDTH, SCREEN_HEIGHT, DEBUG_MODE)
+        self.options = getMazeInfo()
         # Initialize player
-        self.player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, min(options["wall_size"], options["wall_size"]) // 3)
+
+        self.player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, self.options["wall_size"] // 3)
         self.pauseMenu = PauseMenu(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-        self.nextScreen = None  # Track next screen to switch to
+        self.speed = SPEED * self.options["wall_size"] / 100  # Adjust speed based on wall size
 
-        
+        self.nextScreen = None 
+        self.exit_rect = [wall.rect for wall in self.classWallList if wall.type == "exit"][0]  # Get the exit wall rectangle
+
+        self.time_display = TextBox(
+            position=(SCREEN_WIDTH - 150, 10), 
+            size=(140, 30), 
+            text_color=(0, 0, 0), 
+            background_color=(126, 217, 81),
+            font=1,
+            text="Time: 0.00s"
+        )
+
+        self.debug_mode = DEBUG_MODE
+        self.current_seconds = 0
+
     def checkCollision(self, dx, dy):
         is_colliding = [False, False] #Eixo X e Y
         # Check for collisions with walls
         playerPosHitbox = self.player.hitbox.copy()
         playerPosHitbox_x = playerPosHitbox.move(dx, 0)
         playerPosHitbox_y = playerPosHitbox.move(0, dy)
+        #paint the new hitbox
+        if self.debug_mode:
+            pygame.draw.rect(pygame.display.get_surface(), "blue", playerPosHitbox_x, 2)
+            pygame.draw.rect(pygame.display.get_surface(), "yellow", playerPosHitbox_y, 2)
+
+
         mazeHitbox = [wall.rect for wall in self.classWallList if wall.active]  # Only check active walls
         is_colliding[0] = playerPosHitbox_x.collidelist(mazeHitbox) != -1
         is_colliding[1] = playerPosHitbox_y.collidelist(mazeHitbox) != -1
         return is_colliding
     
     def update(self, dt, screen, events):
-
-        
-        
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.pauseMenu.isPaused = not self.pauseMenu.isPaused
-        #if event.key == pygame.K_r:
-        # Reset player position to the center of the screen
-            #self.player.move_to_cell(len(self.classWallList[0].rect) // 2, len(self.classWallList) // 2, self.classWallList[0].rect.width, self.classWallList[0].rect.height)
-        # Calculate speed based on delta time
+                 #if event.key == pygame.K_r:
+                    # Reset player position to the center of the screen
+                    #self.player.move_to_cell(len(self.classWallList[0].rect) // 2, len(self.classWallList) // 2, self.classWallList[0].rect.width, self.classWallList[0].rect.height)
+            if event.type == pygame.USEREVENT and not self.pauseMenu.isPaused:
+                self.current_seconds += 0.1
 
         if not self.pauseMenu.isPaused:
             if dt == 0:
@@ -46,7 +68,7 @@ class NewGame:
             if dt > 1:
                 dt = 1 / 60 # Prevent dt from being too large
             # Speed is 300 pixels per second
-            speed = SPEED * dt
+            speed = self.speed * dt
 
             delta = userInput(speed)
             dx, dy = delta[0], delta[1]
@@ -56,6 +78,9 @@ class NewGame:
             for wall in self.classWallList:
                 wall.rect.x -= dx * (1-is_colliding[0])
                 wall.rect.y -= dy * (1-is_colliding[1])
+            
+            if (self.player.hitbox.colliderect(self.exit_rect)):
+                self.nextScreen = 'win'
 
         #Draw the maze walls
         for i, wall in enumerate(self.classWallList):
@@ -63,7 +88,9 @@ class NewGame:
         keys = pygame.key.get_pressed()
 
         # draw the player as a circle
-        self.player.draw(screen)
+        self.player.draw(screen, self.debug_mode)
+
+        self.time_display.draw(screen, text=f"Time: {self.current_seconds:.1f}s")
 
         if self.pauseMenu.isPaused:
             self.pauseMenu.draw(screen)

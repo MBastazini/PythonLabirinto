@@ -1,7 +1,7 @@
-from util import Button, TextBox
+from util import Button, TextBox, BackButton
 import pygame
 
-class LevelSelector:
+class NewLevelScreen:
     def __init__(self, screen_width, screen_height):
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -9,6 +9,11 @@ class LevelSelector:
         self.text_color = (28, 77, 5)
         self.startGame = False
         self.difficulty = 1  # Default difficulty
+
+        self.next_screen = None
+        self.back_button = BackButton(
+            onClick=lambda: setattr(self, 'next_screen', 'level_selector')
+        )
 
         self.title = TextBox(
             position=(self.screen_width // 2 - 200, 50),
@@ -34,6 +39,8 @@ class LevelSelector:
 
         # Draw title
         self.title.draw(screen)
+        # Draw back button
+        self.back_button.draw(screen)
 
         # Draw level buttons
         for button in self.level_buttons:
@@ -42,6 +49,7 @@ class LevelSelector:
     def update(self, screen, events):
         for button in self.level_buttons:
             button.update(events)
+        self.back_button.update(events)
         self.draw(screen)
 
     def level_selected(self, level):

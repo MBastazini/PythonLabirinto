@@ -17,14 +17,14 @@ class TextBox:
         self.background_color = background_color
         self.padding = 10 #for the background rectangle
 
-    def draw(self, screen):
+    def draw(self, screen, text=None):
         # Draw the background
         if self.background_color:
             # Draw a rectangle for the background, if there is a background
             background_rect = pygame.Rect(self.position[0]-self.padding, self.position[1]-self.padding, self.size[0]+self.padding*2, self.size[1]+self.padding*2)
             pygame.draw.rect(screen, self.background_color, background_rect)
         # Render the text
-        text_surface = self.font.render(self.text, True, self.text_color)
+        text_surface = self.font.render(text if text else self.text, True, self.text_color)
         text_rect = text_surface.get_rect(center=(self.position[0] + self.size[0] // 2, self.position[1] + self.size[1] // 2))
         screen.blit(text_surface, text_rect)
         

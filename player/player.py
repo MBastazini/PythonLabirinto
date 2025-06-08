@@ -12,10 +12,11 @@ class Player:
         # Atualiza a hitbox com base na posição atual
         self.hitbox.topleft = (self.pos.x - self.radius, self.pos.y - self.radius)
     
-    def draw(self, surface):
+    def draw(self, surface, debug=False):
         pygame.draw.circle(surface, self.color, self.pos, self.radius)
         # Se quiser visualizar a hitbox para debug, pode desenhar assim:
-        # pygame.draw.rect(surface, "red", self.hitbox, 2)
+        if debug:
+            pygame.draw.rect(surface, "red", self.hitbox, 2)
 
     def move(self, dx, dy):
         self.pos.x += dx
