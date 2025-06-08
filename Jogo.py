@@ -7,27 +7,37 @@ pygame.init()
 from maze import Wall, newMaze
 from player import Player
 from screens import TitleScreen, LevelSelectorScreen, ScoresScreen, WinScreen, CampaignScreen, NewLevelScreen
+from screens import NewPlayerScreen
 from new_game import NewGame as Mode1NewGame, userInput
 
 
 DEBUG_MODE = False
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 running = True
 dt = 0
 
 game = None  # Initialize game variable
-titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+titleScreen = None
 levelSelector = LevelSelectorScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 campaignScreen = CampaignScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 newLevelScreen = NewLevelScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+newPlayerScreen = NewPlayerScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 
 scoresScreen = ScoresScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 winScreen = None
 activeScreen = "title"  # Track which screen is active
+
+player_file = None
+try:
+    player_file = open("saves/players/player_2.txt", "r")
+    titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT, player_file)
+except FileNotFoundError:
+    activeScreen = "new_player"
+
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -40,11 +50,22 @@ while running:
     screen.fill("white")
 
     match activeScreen:
+        case "new_player":
+            newPlayerScreen.update(screen, events)
+            if newPlayerScreen.next_screen:
+                activeScreen = newPlayerScreen.next_screen
+                newPlayerScreen.next_screen = None
+                if activeScreen == "title":
+                    titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT, player_file)
         case "title":
-            titleScreen.update(screen, events)
-            if titleScreen.nextScreen:
-                activeScreen = titleScreen.nextScreen
-                titleScreen.nextScreen = None
+            if(titleScreen):
+                titleScreen.update(screen, events)
+                if titleScreen.nextScreen:
+                    activeScreen = titleScreen.nextScreen
+                    titleScreen.nextScreen = None
+            else:
+                # If player file is not found, show new player screen
+                activeScreen = "new_player"
         case "level_selector":
             levelSelector.update(screen, events)
             if levelSelector.next_screen:

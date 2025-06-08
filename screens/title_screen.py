@@ -2,15 +2,27 @@ from util import Button, TextBox
 import pygame
 
 class TitleScreen:
-    def __init__(self, screen_width, screen_height):
+    def __init__(self, screen_width, screen_height, player_file):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.background_color = (126, 217, 81)
         self.nextScreen = None
 
+        self.active_player_name = player_file.readlines()[0].replace("\n", "") if player_file else "Player"
+
         padding_top = 30
         padding = 30
         #botão de jogar
+
+        self.active_player_text = TextBox(
+            position=(self.screen_width // 2 - 200, 50),
+            size=(400, 50),
+            text=f"Active Player: {self.active_player_name}",
+            font=1,
+            text_color=(28, 77, 5),
+            background_color=False  # no background
+        )
+
         self.titleText = TextBox(
             position=(self.screen_width // 2 - 200, self.screen_height // 2 - 100),
             size=(400, 100),
@@ -37,6 +49,8 @@ class TitleScreen:
 
         # Draw title text
         self.titleText.draw(screen)
+        # Draw active player text
+        self.active_player_text.draw(screen)
 
         # Draw buttons 
         self.bPlay.draw(screen)
