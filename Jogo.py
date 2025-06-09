@@ -7,7 +7,7 @@ pygame.init()
 from maze import Wall, newMaze
 from player import Player
 from screens import TitleScreen, LevelSelectorScreen, ScoresScreen, WinScreen, CampaignScreen, NewLevelScreen
-from screens import NewPlayerScreen
+from screens import NewPlayerScreen, SaveFilesScreen
 from new_game import NewGame as Mode1NewGame, userInput
 
 
@@ -25,18 +25,18 @@ titleScreen = None
 levelSelector = LevelSelectorScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 campaignScreen = CampaignScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 newLevelScreen = NewLevelScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
-newPlayerScreen = NewPlayerScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
-
+saveFilesScreen = SaveFilesScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 scoresScreen = ScoresScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 winScreen = None
 activeScreen = "title"  # Track which screen is active
 
 player_file = None
 try:
-    player_file = open("saves/players/player_2.txt", "r")
+    player_file = open("saves/players/player_1.txt", "r")
     titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT, player_file)
 except FileNotFoundError:
-    activeScreen = "new_player"
+    newPlayerScreen = NewPlayerScreen(SCREEN_WIDTH, SCREEN_HEIGHT, 'saves/players/player_1.txt')
+    activeScreen = "first_run"
 
 while running:
     # poll for events
@@ -50,7 +50,7 @@ while running:
     screen.fill("white")
 
     match activeScreen:
-        case "new_player":
+        case "first_run":
             newPlayerScreen.update(screen, events)
             if newPlayerScreen.next_screen:
                 activeScreen = newPlayerScreen.next_screen
@@ -65,7 +65,7 @@ while running:
                     titleScreen.nextScreen = None
             else:
                 # If player file is not found, show new player screen
-                activeScreen = "new_player"
+                activeScreen = "first_run"
         case "level_selector":
             levelSelector.update(screen, events)
             if levelSelector.next_screen:
@@ -76,6 +76,11 @@ while running:
             if campaignScreen.next_screen:
                 activeScreen = campaignScreen.next_screen
                 campaignScreen.next_screen = None
+        case "save_files":
+            saveFilesScreen.update(screen, events)
+            if saveFilesScreen.next_screen:
+                activeScreen = saveFilesScreen.next_screen
+                saveFilesScreen.next_screen = None
         case "new_level":
             newLevelScreen.update(screen, events)
             if newLevelScreen.next_screen:

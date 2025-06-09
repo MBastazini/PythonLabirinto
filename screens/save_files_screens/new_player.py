@@ -2,13 +2,15 @@ import pygame
 from util import Button, TextBox, InputBox
 
 class NewPlayerScreen:
-    def __init__(self, screen_width, screen_height):
+    def __init__(self, screen_width, screen_height, file_name='saves/players/player_1.txt'):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.background_color = (126, 217, 81)
         self.text_color = (28, 77, 5)
         self.next_screen = None
 
+        self.file_name = file_name
+        
         self.title = TextBox(
             position=(self.screen_width // 2 - 200, 50),
             size=(400, 100),
@@ -58,5 +60,8 @@ class NewPlayerScreen:
     def start_game(self):
         player_name = self.name_input_box.text.strip()
         if player_name:
+            f = open(self.file_name, 'w')
+            f.write(player_name)
+            f.close()
             print(f"Starting game for player: {player_name}")
-            self.next_screen = 'level_selector'
+            self.next_screen = 'title'

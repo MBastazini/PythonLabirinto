@@ -43,6 +43,12 @@ class TitleScreen:
             position=(self.screen_width // 2 - 100, self.screen_height // 2 + padding_top + padding + self.bPlay.size[1]),
             onClick=self.show_scores
         )
+        self.bNewPlayer = Button(
+            text="Save files",
+            size=(200, 50),
+            position=(self.screen_width // 2 - 100, self.screen_height // 2 + padding_top + padding * 2 + self.bPlay.size[1] + self.bScores.size[1]),
+            onClick=lambda: setattr(self, 'nextScreen', 'save_files')
+        )
 
     def draw(self, screen):
         screen.fill(self.background_color)
@@ -55,10 +61,12 @@ class TitleScreen:
         # Draw buttons 
         self.bPlay.draw(screen)
         self.bScores.draw(screen)
+        self.bNewPlayer.draw(screen)
 
     def update(self, screen, events):
         self.bPlay.update(events)
         self.bScores.update(events)
+        self.bNewPlayer.update(events)
         self.draw(screen)
 
     def start_game(self):
