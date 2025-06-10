@@ -29,6 +29,26 @@ class PauseMenu:
 
         self.isPaused = False
         self.events = []
+
+        are_you_sure = TextBox(
+            text="Are you sure you want to quit?", 
+            position=(self.screen_width // 2 - 150, self.screen_height // 2 - 50), 
+            size=(300, 50), 
+            text_color=self.text_color, 
+            font=1
+        )
+
+        self.btn_are_you_sure = Button(
+            text="Are you sure?",
+            onClick=self.quit_game,  # Placeholder, will be handled in draw
+            size=(300, 50),
+            position=(self.screen_width // 2 - 150, self.screen_height // 2 - 150),
+        )
+        self.newSurface = pygame.Surface((self.screen_width, self.screen_height))
+        self.newSurface.fill((255,255,255))  # Semi-transparent overlay
+
+        self.areYouSure = False
+
     def create_buttons(self):
         self.resume_button = Button(
             text="Resume", 
@@ -44,13 +64,16 @@ class PauseMenu:
         )
         self.quit_button = Button(
             text="Quit", 
-            onClick=self.quit_game,
+            onClick=self.quit_game_1,
             size=(200, 50),
             position=(self.screen_width // 2 - 100, self.screen_height // 2 + 180)
         )
 
     def resume_game(self):
         self.isPaused = False
+
+    def quit_game_1(self):
+        self.areYouSure = True
 
     def quit_game(self):
         pygame.quit()
@@ -65,6 +88,10 @@ class PauseMenu:
         self.return_button.draw(self.screen)
         self.quit_button.draw(self.screen)
         screen.blit(self.screen, (0, 0))
+        if(self.areYouSure):
+            self.btn_are_you_sure.draw(self.newSurface)
+            screen.blit(self.newSurface, (0, 0))
+
 
     def update(self, screen, events):
         if self.isPaused:
@@ -72,5 +99,7 @@ class PauseMenu:
             self.return_button.update(events)
             self.quit_button.update(events)
             self.draw(screen)
+            if(self.areYouSure):
+                self.btn_are_you_sure.update(events)
         
         return self.events

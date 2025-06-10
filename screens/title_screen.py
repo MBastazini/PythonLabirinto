@@ -1,14 +1,18 @@
 from util import Button, TextBox
+import settings
 import pygame
 
 class TitleScreen:
-    def __init__(self, screen_width, screen_height, player_file):
+    def __init__(self, screen_width, screen_height):
+
+        
+
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.background_color = (126, 217, 81)
         self.nextScreen = None
 
-        self.active_player_name = player_file.readlines()[0].replace("\n", "") if player_file else "Player"
+        self.active_player_name = settings.save_files[settings.active_save_file - 1][1]
 
         padding_top = 30
         padding = 30

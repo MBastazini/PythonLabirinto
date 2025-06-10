@@ -1,4 +1,5 @@
 import pygame
+import settings
 from util import Button, TextBox, InputBox
 
 class NewPlayerScreen:
@@ -61,7 +62,13 @@ class NewPlayerScreen:
         player_name = self.name_input_box.text.strip()
         if player_name:
             f = open(self.file_name, 'w')
-            f.write(player_name)
+            f.write("1 \n")
+            f.write(f"{player_name} \n")
             f.close()
+
+            settings.active_save_file = 1
+            settings.save_files[0][0] = 1
+            settings.save_files[0][1] = player_name
+            
             print(f"Starting game for player: {player_name}")
             self.next_screen = 'title'

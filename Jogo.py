@@ -1,5 +1,6 @@
 import pygame
-
+import settings
+import os 
 # pygame setup
 pygame.init()
 
@@ -25,18 +26,46 @@ titleScreen = None
 levelSelector = LevelSelectorScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 campaignScreen = CampaignScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 newLevelScreen = NewLevelScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
-saveFilesScreen = SaveFilesScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+saveFilesScreen = None
 scoresScreen = ScoresScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
 winScreen = None
 activeScreen = "title"  # Track which screen is active
 
-player_file = None
-try:
-    player_file = open("saves/players/player_1.txt", "r")
-    titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT, player_file)
-except FileNotFoundError:
-    newPlayerScreen = NewPlayerScreen(SCREEN_WIDTH, SCREEN_HEIGHT, 'saves/players/player_1.txt')
+#see if the 3 save files exist, if not, create one.
+
+saveFile1 = "saves/players/player_1.txt"
+saveFile2 = "saves/players/player_2.txt"
+saveFile3 = "saves/players/player_3.txt"
+def check_save_file(file_path, index):
+    try:
+        if not os.path.exists(file_path):
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            with open(file_path, "w") as f:
+                f.write("0\n")
+        else:
+            with open(file_path, "r") as f:
+                file = f.readlines()
+            if len(file) > 0 and int(file[0]) > 0:
+                settings.save_files[index][0] = True
+                settings.save_files[index][1] = file[1].strip().replace("\n", "")
+    except Exception as e:
+        print(f"Erro ao acessar o arquivo {file_path}: {e}")
+        # aqui você pode decidir o que fazer em caso de erro
+
+
+check_save_file(saveFile1, 0)
+check_save_file(saveFile2, 1)
+check_save_file(saveFile3, 2)
+
+#check if save_file_1 has data inside, if not, create a new player.
+if (settings.save_files[0][0] == False):
+    print("No player found in save file 1, creating a new player.")
+    newPlayerScreen = NewPlayerScreen(SCREEN_WIDTH, SCREEN_HEIGHT, saveFile1)
     activeScreen = "first_run"
+else:
+    print("Player found in save file 1, loading the game.")
+    titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
+    settings.active_save_file = 1
 
 while running:
     # poll for events
@@ -56,11 +85,13 @@ while running:
                 activeScreen = newPlayerScreen.next_screen
                 newPlayerScreen.next_screen = None
                 if activeScreen == "title":
-                    titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT, player_file)
+                    titleScreen = TitleScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
         case "title":
             if(titleScreen):
                 titleScreen.update(screen, events)
                 if titleScreen.nextScreen:
+                    if titleScreen.nextScreen == "save_files":
+                        saveFilesScreen = SaveFilesScreen(SCREEN_WIDTH, SCREEN_HEIGHT)
                     activeScreen = titleScreen.nextScreen
                     titleScreen.nextScreen = None
             else:
@@ -80,7 +111,7 @@ while running:
             saveFilesScreen.update(screen, events)
             if saveFilesScreen.next_screen:
                 activeScreen = saveFilesScreen.next_screen
-                saveFilesScreen.next_screen = None
+                saveFilesScreen = None
         case "new_level":
             newLevelScreen.update(screen, events)
             if newLevelScreen.next_screen:
