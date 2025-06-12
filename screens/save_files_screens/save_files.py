@@ -1,6 +1,7 @@
-from util import Button, TextBox, BackButton
+from util import Button, TextBox, BackButton, AreYouSureSurface
 import settings
 import pygame
+import os
 
 #creates a screen with 3 buttons (3 save files) and a back button
 class SaveFilesScreen:
@@ -32,15 +33,45 @@ class SaveFilesScreen:
 
             ) for i in range(3)
         ]
-
+        # Create the AreYouSureSurface for delete confirmation
+        self.areYouSureDelete = AreYouSureSurface(
+            screen_width=self.screen_width,
+            screen_height=self.screen_height,
+            confirmAction=self.deleteSaveFile,  # Action to confirm deletion
+            cancelAction=self.cancelDelete  # Action to cancel deletion
+        )
         self.back_button = BackButton(
             onClick=lambda: setattr(self, 'next_screen', 'title')
         )
 
+        self.rename_button = Button(
+            text="Rename Save File",
+            size=(200, 50),
+            position=(50, self.screen_height - 100),
+            onClick=lambda: setattr(self, 'next_screen', 'rename_save_file')
+        )
+
+        self.delete_button = Button(
+            text="Delete Save File",
+            size=(200, 50),
+            position=(self.screen_width - 250, self.screen_height - 100),
+            onClick=self.areYouSureDelete.toggle
+        )
+
+        
         #test to see witch save files exist and witch don't
     def select_save_file(self, file_index):
         settings.active_save_file = file_index+1
         print(f"Selected Save File {settings.active_save_file}")
+
+        #saves/cache.txt file stores the save file selected before the player leaves
+        with open('saves/cache.txt', 'w') as f:
+            f.write(str(settings.active_save_file))
+
+        if(not settings.save_files[file_index][0]): #Isso está "Falso" se player não existe
+            self.next_screen = 'new_player'
+            return
+
         self.next_screen = 'title'
         # Here you can add logic to load the selected save file
 
@@ -56,14 +87,50 @@ class SaveFilesScreen:
 
         # Draw back button
         self.back_button.draw(screen)
+        self.rename_button.draw(screen)
+        self.delete_button.draw(screen)
     
     def update(self, screen, events):
+
+        if self.areYouSureDelete.active:
+            self.areYouSureDelete.update(screen, events)
+            return None
+        
         for button in self.save_buttons:
             button.update(events)
         self.back_button.update(events)
+        self.rename_button.update(events)
+        self.delete_button.update(events)
         self.draw(screen)
+
+        
 
         # Check if next screen is set
         if self.next_screen:
             return self.next_screen
         return None
+
+    def deleteSaveFile(self):
+        # Logic to delete the selected save file
+        self.areYouSureDelete.toggle()  # Hide the confirmation dialog
+        file_index = settings.active_save_file - 1
+        file_path = settings.save_files[file_index][2]
+        #rewrite the content in the file to 0
+        with open(file_path, 'w') as f:
+            f.write("0\n")
+        
+        settings.save_files[file_index][0] = False
+        settings.save_files[file_index][1] = None
+        self.next_screen = 'reload'
+
+        for i in range(len(settings.save_files)):
+            if(settings.save_files[i][0]):
+                settings.active_save_file = i + 1
+                #when this executes, stop the for
+                break
+        #update cache file
+        with open(settings.cache_path, 'w') as f:
+            f.write(str(settings.active_save_file))
+    
+    def cancelDelete(self):
+        self.areYouSureDelete.toggle()

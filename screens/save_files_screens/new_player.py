@@ -3,12 +3,13 @@ import settings
 from util import Button, TextBox, InputBox
 
 class NewPlayerScreen:
-    def __init__(self, screen_width, screen_height, file_name='saves/players/player_1.txt'):
+    def __init__(self, screen_width, screen_height, file_name='saves/players/player_1.txt', active_save_file=1):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.background_color = (126, 217, 81)
         self.text_color = (28, 77, 5)
         self.next_screen = None
+        self.active_save_file = active_save_file
 
         self.file_name = file_name
         
@@ -66,9 +67,14 @@ class NewPlayerScreen:
             f.write(f"{player_name} \n")
             f.close()
 
-            settings.active_save_file = 1
-            settings.save_files[0][0] = 1
-            settings.save_files[0][1] = player_name
-            
+            settings.active_save_file = self.active_save_file
+            settings.save_files[self.active_save_file-1][0] = 1
+            settings.save_files[self.active_save_file-1][1] = player_name
+
             print(f"Starting game for player: {player_name}")
             self.next_screen = 'title'
+    
+    def change_file_path(self, new_file_path):
+        self.active_save_file = settings.active_save_file
+        self.file_name = new_file_path
+        self.name_input_box.text = ""

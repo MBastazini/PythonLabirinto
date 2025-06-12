@@ -1,5 +1,5 @@
 import pygame
-from util import Button, TextBox
+from util import Button, TextBox, AreYouSureSurface
 
 class PauseMenu:
     def __init__(self, screen_width, screen_height):
@@ -30,24 +30,8 @@ class PauseMenu:
         self.isPaused = False
         self.events = []
 
-        are_you_sure = TextBox(
-            text="Are you sure you want to quit?", 
-            position=(self.screen_width // 2 - 150, self.screen_height // 2 - 50), 
-            size=(300, 50), 
-            text_color=self.text_color, 
-            font=1
-        )
 
-        self.btn_are_you_sure = Button(
-            text="Are you sure?",
-            onClick=self.quit_game,  # Placeholder, will be handled in draw
-            size=(300, 50),
-            position=(self.screen_width // 2 - 150, self.screen_height // 2 - 150),
-        )
-        self.newSurface = pygame.Surface((self.screen_width, self.screen_height))
-        self.newSurface.fill((255,255,255))  # Semi-transparent overlay
-
-        self.areYouSure = False
+        self.areYouSureSurface = AreYouSureSurface(screen_width, screen_height, self.quit_game, self.cancel_areYouSure)
 
     def create_buttons(self):
         self.resume_button = Button(
@@ -69,11 +53,14 @@ class PauseMenu:
             position=(self.screen_width // 2 - 100, self.screen_height // 2 + 180)
         )
 
+    def cancel_areYouSure(self):
+        self.areYouSureSurface.toggle()
+
     def resume_game(self):
         self.isPaused = False
 
     def quit_game_1(self):
-        self.areYouSure = True
+        self.areYouSureSurface.toggle()
 
     def quit_game(self):
         pygame.quit()
@@ -88,9 +75,7 @@ class PauseMenu:
         self.return_button.draw(self.screen)
         self.quit_button.draw(self.screen)
         screen.blit(self.screen, (0, 0))
-        if(self.areYouSure):
-            self.btn_are_you_sure.draw(self.newSurface)
-            screen.blit(self.newSurface, (0, 0))
+        
 
 
     def update(self, screen, events):
@@ -99,7 +84,8 @@ class PauseMenu:
             self.return_button.update(events)
             self.quit_button.update(events)
             self.draw(screen)
-            if(self.areYouSure):
-                self.btn_are_you_sure.update(events)
+
+            if self.areYouSureSurface.active:
+                self.areYouSureSurface.update(screen, events)
         
         return self.events
