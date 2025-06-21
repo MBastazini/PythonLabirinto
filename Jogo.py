@@ -145,9 +145,10 @@ while running:
             if game.nextScreen:
                 activeScreen = game.nextScreen
                 elapsed_time = game.current_seconds
+                player_score = game.player.points
                 game = None
                 if( activeScreen == "win"):
-                    winScreen = WinScreen(SCREEN_WIDTH, SCREEN_HEIGHT, elapsed_time)
+                    winScreen = WinScreen(SCREEN_WIDTH, SCREEN_HEIGHT, elapsed_time, player_score)
         case "win":
             winScreen.update(screen, events)
             if winScreen.next_screen:

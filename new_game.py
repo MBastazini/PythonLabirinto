@@ -22,6 +22,8 @@ class NewGame:
         self.nextScreen = None 
         self.exit_rect = [wall.rect for wall in self.classWallList if wall.type == "exit"][0]  # Get the exit wall rectangle
 
+        self.bonus_squares = [wall.rect for wall in self.classWallList if wall.type == "bonus"]  # Get all bonus squares
+
         self.time_display = TextBox(
             position=(SCREEN_WIDTH - 150, 10), 
             size=(140, 30), 
@@ -51,6 +53,16 @@ class NewGame:
         is_colliding[1] = playerPosHitbox_y.collidelist(mazeHitbox) != -1
         return is_colliding
     
+    def checkBonusCollision(self):
+        """
+        Check if the player collides with any bonus squares.
+        If a collision occurs, return True and remove the bonus square from the list.
+        """
+        for bonus in self.bonus_squares:
+            if self.player.hitbox.colliderect(bonus):
+                self.bonus_squares.remove(bonus)
+                self.player.bonusSquare()  # Increment player points
+
     def update(self, dt, screen, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
@@ -81,6 +93,8 @@ class NewGame:
             
             if (self.player.hitbox.colliderect(self.exit_rect)):
                 self.nextScreen = 'win'
+
+            self.checkBonusCollision()
 
         #Draw the maze walls
         for i, wall in enumerate(self.classWallList):

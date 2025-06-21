@@ -38,7 +38,8 @@ class SaveFilesScreen:
             screen_width=self.screen_width,
             screen_height=self.screen_height,
             confirmAction=self.deleteSaveFile,  # Action to confirm deletion
-            cancelAction=self.cancelDelete  # Action to cancel deletion
+            cancelAction=self.cancelDelete,  # Action to cancel deletion
+            customMessage="This will restart your game."
         )
         self.back_button = BackButton(
             onClick=lambda: setattr(self, 'next_screen', 'title')

@@ -1,15 +1,20 @@
 import random
 from maze import Wall
 WALL_SIZE = 50
+
 PAREDE = '#'
 CAMINHO = '.'
 ENTRADA = 'E'
+FIM_DE_CAMINHO = '&'
+QUADRADO_BONUS = '!'
 SAIDA = 'S'
 
 RADIUS = 1/10
 
 EXIT_X = 0
 EXIT_Y = 0
+
+YELLOW_SQUARES = True
 
 def criaMatrizVazia(tamanho):
     return [[PAREDE for _ in range(tamanho)] for _ in range(tamanho)]
@@ -38,7 +43,7 @@ def geraLabirintoRecursivo(matriz, x, y):
         
     if count == 4:
         # Marca a célula atual como saída
-        matriz[y][x] = SAIDA
+        matriz[y][x] = FIM_DE_CAMINHO
 
 def newMaze(size):
     matriz = criaMatrizVazia(size)
@@ -59,18 +64,38 @@ def generateWallList(level_difficulty, SCREEN_WIDTH=600, SCREEN_HEIGHT=600, debu
     wall_width = WALL_SIZE
     wall_height = WALL_SIZE
 
-    #vê todas as saidas e seleciona uma
+    #A diferença de uma "Saida" para um "Caminho sem saida", é que a saida deve estar fora...
+    #... do circulo central (determinado por RAIDUS), e ser um "Caminho sem saida"
+
+    #Guarda todas as saidas em um array para futuramnte escolher uma
     all_exits = []
+    #Guarda todos os caminhos sem saida em uma matriz para poder gerar quadrados especiais
+    #(Como um que dá mais pontuação)
+    all_fim_de_caminho = []
     for y, row in enumerate(matriz):
         for x, cell in enumerate(row):
-            if cell == SAIDA:
+            if cell == FIM_DE_CAMINHO:
+                all_fim_de_caminho.append((x, y))
                 if (y < len(matriz)*(RADIUS) or y > len(matriz)*(1-RADIUS) or x < len(matriz[0])*(RADIUS) or x > len(matriz[0])*(1-RADIUS)):
                     all_exits.append((x, y))
 
     if all_exits:
         # Select a random exit
         exit_x, exit_y = random.choice(all_exits)
-        EXIT_X, EXIT_Y = exit_x, exit_y
+        all_fim_de_caminho.remove((exit_x, exit_y))
+        matriz[exit_y][exit_x] = SAIDA
+        #LEMBRA Q VC TAVA  MUDANDO ISSO!!!!!!!!!
+        #AGORA NN E MAIS "SAIDA", é "FIM DE CAMINHO"
+        #ALTERAR O RESTO!!!!!!!!!!!!!
+
+    if (all_fim_de_caminho):
+        #seleciona um numero aleatorio de caminhos sem saida
+        number_of_special_squares = random.randint(1, len(all_fim_de_caminho))
+        for _ in range(number_of_special_squares):
+            # Select a random path without exit
+            x, y = random.choice(all_fim_de_caminho)
+            matriz[y][x] = QUADRADO_BONUS
+            all_fim_de_caminho.remove((x, y))
 
     for y, row in enumerate(matriz):
         for x, cell in enumerate(row):
@@ -86,13 +111,15 @@ def generateWallList(level_difficulty, SCREEN_WIDTH=600, SCREEN_HEIGHT=600, debu
                 # If the cell is the starting point, draw it as a wall
                 wall = Wall(x * wall_width, y * wall_height, wall_width, wall_height, color="green", active=False)
                 classWallList.append(wall)
-            if cell == SAIDA:
-                if not debug_mode:
-                    if x == EXIT_X and y == EXIT_Y:
-                        
-                        wall = Wall(x * wall_width, y * wall_height, wall_width, wall_height, color="red", active=False, type="exit")
-                        classWallList.append(wall)
                 #se não for saoda é caminho, não desenha nada
+            if cell == SAIDA: 
+                if not debug_mode:  
+                    wall = Wall(x * wall_width, y * wall_height, wall_width, wall_height, color="red", active=False, type="exit")
+                    classWallList.append(wall)
+            if cell == QUADRADO_BONUS:
+                # If the cell is a special square, draw it as a wall with a different color
+                wall = Wall(x * wall_width, y * wall_height, wall_width, wall_height, color="yellow", active=False, type="bonus")
+                classWallList.append(wall)
             if(x == len(matriz)//2 and y == len(matriz)//2+2) and debug_mode:
                 wall = Wall(x * wall_width, y * wall_height, wall_width, wall_height, color="red", active=False, type="exit")
                 classWallList.append(wall)

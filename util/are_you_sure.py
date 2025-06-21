@@ -3,7 +3,7 @@ from .button import Button
 from .text_box import TextBox
 
 class AreYouSureSurface:
-    def __init__(self, screen_width, screen_height, confirmAction: callable, cancelAction: callable):
+    def __init__(self, screen_width, screen_height, confirmAction: callable, cancelAction: callable, customMessage = None):
         self.active = False
         self.confirmAction = confirmAction
         self.cancelAction = cancelAction
@@ -13,9 +13,18 @@ class AreYouSureSurface:
         self.newSurface.fill((255,255,255))
         self.background_color = (126, 217, 81)
         self.text_color = (28, 77, 5)
+        self.customMessage = customMessage
 
         self.are_you_sure_text = TextBox(
             text="Are you sure?",
+            position=(self.screen_width // 2 - 150, self.screen_height // 2 - 120),
+            size=(300, 50),
+            text_color=self.text_color,
+            font=1
+        )
+
+        self.customMessage_text = TextBox(
+            text=self.customMessage if self.customMessage else "",
             position=(self.screen_width // 2 - 150, self.screen_height // 2 - 50),
             size=(300, 50),
             text_color=self.text_color,
@@ -46,6 +55,7 @@ class AreYouSureSurface:
 
     def draw(self):
         self.are_you_sure_text.draw(self.newSurface)
+        self.customMessage_text.draw(self.newSurface)
         self.yes_button.draw(self.newSurface)
         self.no_button.draw(self.newSurface)
 

@@ -81,4 +81,4 @@ class TitleScreen:
 
     def reload_screen(self):
         active_player = settings.save_files[settings.active_save_file-1][1] if settings.save_files[settings.active_save_file-1][0] else "Save file error"
-        self.active_player_text.set_text(active_player)
+        self.active_player_text.set_text(f'Active player: {active_player}')

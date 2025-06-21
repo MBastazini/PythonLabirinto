@@ -20,15 +20,22 @@ class CampaignScreen:
         self.back_button = BackButton(
             onClick=self.back_to_level_selector
         )
-        self.level_buttons = [
-            Button(
-                text=f"Level {i}",
-                size=(200, 50),
-                position=(self.screen_width // 2 - 100, self.screen_height // 2 - 100 + i * 60),
-                onClick=lambda i=i: self.select_level(i)
-            )
-            for i in range(1, 4)
-        ]
+        self.level_buttons = []
+
+        #determina o padding inicial pra deixar os botões centralizados
+        total_button_size = 50 * 4 + 50 * 3  # 4 buttons, each 50px tall, with 100px spacing
+        initial_padding = (self.screen_width - total_button_size) // 2
+        count = 1
+        for i in range(0, 4):
+            for j in range(0, 4):
+                newBtn = Button(
+                    text=f"{count}",
+                    size=(50, 50),
+                    position=(initial_padding + (100*j), (self.screen_width // 2 - 100) + (100*i)),
+                    onClick=lambda level=i: self.select_level(level)
+                )
+                count += 1
+                self.level_buttons.append(newBtn)
 
     def select_level(self, level):
         self.next_screen = f"level_{level}"
