@@ -22,23 +22,36 @@ class CampaignScreen:
         )
         self.level_buttons = []
 
+        #tenta abrir o arquivo de cache (diz quantas fases existem)
+        try:
+            with open("saves/fases/cache.txt", "r") as cache_file:
+                lines = cache_file.readlines()
+                #print(f"Cache file found: {lines}")
+                self.level_count = int(lines[0].strip())
+        except (FileNotFoundError, ValueError):
+            self.level_count = 0
+
         #determina o padding inicial pra deixar os botões centralizados
         total_button_size = 50 * 4 + 50 * 3  # 4 buttons, each 50px tall, with 100px spacing
         initial_padding = (self.screen_width - total_button_size) // 2
         count = 1
         for i in range(0, 4):
             for j in range(0, 4):
+                if count > self.level_count:
+                    break
                 newBtn = Button(
                     text=f"{count}",
                     size=(50, 50),
                     position=(initial_padding + (100*j), (self.screen_width // 2 - 100) + (100*i)),
-                    onClick=lambda level=i: self.select_level(level)
+                    onClick=lambda level=count: self.select_level(level),
+                    color= (255, 255, 255) if True else (51, 204, 51)  # Default color
                 )
                 count += 1
                 self.level_buttons.append(newBtn)
 
     def select_level(self, level):
-        self.next_screen = f"level_{level}"
+        #print(f"Selected level: {level}")
+        self.next_screen = f"fase{level}" #nome do arquivo da fase
 
     def back_to_level_selector(self):
         self.next_screen = "level_selector"

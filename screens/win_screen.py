@@ -20,7 +20,7 @@ class WinScreen:
         self.player_score_text_box = TextBox(
             position=(self.screen_width // 2 - 200, self.screen_height // 2 - 50),
             size=(400, 50),
-            text=f"Score: {player_score}",
+            text=f"Coins: {player_score}",
             font=1,
             text_color=self.text_color,
             background_color=False  # no background

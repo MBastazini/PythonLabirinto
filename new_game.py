@@ -9,8 +9,8 @@ SPEED = 501 # Speed in pixels per second
 pygame.time.set_timer(pygame.USEREVENT, 100)
 
 class NewGame:
-    def __init__ (self, SCREEN_WIDTH, SCREEN_HEIGHT, level_difficulty, DEBUG_MODE=False):
-        self.classWallList = generateWallList(level_difficulty, SCREEN_WIDTH, SCREEN_HEIGHT, DEBUG_MODE)
+    def __init__ (self, SCREEN_WIDTH, SCREEN_HEIGHT, level_difficulty=1, DEBUG_MODE=False, custom_maze=None):
+        self.classWallList = generateWallList(level_difficulty, SCREEN_WIDTH, SCREEN_HEIGHT, DEBUG_MODE, custom_maze)
         self.options = getMazeInfo()
         # Initialize player
 

@@ -6,3 +6,4 @@ save_files = [
 ]
 
 cache_path = 'saves/cache.txt'
+level_path = 'saves/fases/'

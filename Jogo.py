@@ -14,12 +14,31 @@ from new_game import NewGame as Mode1NewGame, userInput
 
 DEBUG_MODE = False
 
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 running = True
 dt = 0
+
+def open_file(file_path):
+    try:
+        with open(file_path, "r") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        print(f"File {file_path} not found.")
+        return None
+    except Exception as e:
+        print(f"Error reading file {file_path}: {e}")
+        return None
+
+def create_matrix(string):
+    new_matrix = []
+    for linha in string.split("\n"):
+        if linha.strip() == "":
+            continue
+        new_matrix.append([char for char in linha.strip()])
+    return new_matrix
 
 #see if the 3 save files exist, if not, create one.
 def check_save_file(file_path, index):
@@ -111,6 +130,18 @@ while running:
             if campaignScreen.next_screen:
                 activeScreen = campaignScreen.next_screen
                 campaignScreen.next_screen = None
+                if activeScreen.startswith("fase"):
+                    level_path = settings.level_path + activeScreen + ".txt"
+                    string = open_file(level_path)
+                    matrix = create_matrix(string)
+                    print(f"Loading level {activeScreen} from {level_path}...")
+                    if matrix is None:
+                        #print(f"Error loading level {activeScreen}.")
+                        activeScreen = "campaign"
+                    else:
+                        game = Mode1NewGame(SCREEN_WIDTH, SCREEN_HEIGHT, 1, DEBUG_MODE, matrix)
+                        activeScreen = "game"
+
         case "save_files":
             saveFilesScreen.update(screen, events)
             if saveFilesScreen.next_screen:
@@ -147,7 +178,7 @@ while running:
                 elapsed_time = game.current_seconds
                 player_score = game.player.points
                 game = None
-                if( activeScreen == "win"):
+                if(activeScreen == "win"):
                     winScreen = WinScreen(SCREEN_WIDTH, SCREEN_HEIGHT, elapsed_time, player_score)
         case "win":
             winScreen.update(screen, events)
