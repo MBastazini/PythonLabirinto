@@ -1,4 +1,5 @@
 from maze import Wall, newMaze, generateWallList, getMazeInfo
+import settings
 from player import Player
 from screens import PauseMenu
 from util import TextBox
@@ -10,16 +11,33 @@ pygame.time.set_timer(pygame.USEREVENT, 100)
 
 class NewGame:
     def __init__ (self, SCREEN_WIDTH, SCREEN_HEIGHT, level_difficulty=1, DEBUG_MODE=False, custom_maze=None):
-        self.classWallList = generateWallList(level_difficulty, SCREEN_WIDTH, SCREEN_HEIGHT, DEBUG_MODE, custom_maze)
+
+        matrix = None
+        if(custom_maze):
+            level_path = settings.level_path + custom_maze + ".txt"
+            string = open_file(level_path)
+            matrix = create_matrix(string)
+            print(f"Loading level {custom_maze} from {level_path}...")
+            
+            if not matrix:
+                print(f"Error: Level {custom_maze} not found or empty.")
+                self.nextScreen = 'title'
+                return
+        else:
+            matrix = newMaze(23 + (
+                level_difficulty * 4 * 3
+            )) #multiplos de 4 (o 3 é a escala com que as dificuldades aumentam)
+
+        self.classWallList = generateWallList(SCREEN_WIDTH, SCREEN_HEIGHT, DEBUG_MODE, matrix)
         self.options = getMazeInfo()
         # Initialize player
 
+        self.nextScreen = None 
         self.player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, self.options["wall_size"] // 3)
         self.pauseMenu = PauseMenu(SCREEN_WIDTH, SCREEN_HEIGHT)
 
         self.speed = SPEED * self.options["wall_size"] / 100  # Adjust speed based on wall size
 
-        self.nextScreen = None 
         self.exit_rect = [wall.rect for wall in self.classWallList if wall.type == "exit"][0]  # Get the exit wall rectangle
 
         self.bonus_squares = [wall.rect for wall in self.classWallList if wall.type == "bonus"]  # Get all bonus squares
@@ -35,6 +53,10 @@ class NewGame:
 
         self.debug_mode = DEBUG_MODE
         self.current_seconds = 0
+
+        self.is_level = True if custom_maze else False  # Determine if this is a level or a custom maze
+        self.level = None if not custom_maze else custom_maze
+        self.matrix = matrix if matrix else None  # Store the matrix if provided, otherwise None
 
     def checkCollision(self, dx, dy):
         is_colliding = [False, False] #Eixo X e Y
@@ -129,3 +151,23 @@ def userInput(speed=1):
     if keys[pygame.K_d]:
         dx = 1 * speed  
     return [dx, dy]
+
+
+def open_file(file_path):
+    try:
+        with open(file_path, "r") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        print(f"File {file_path} not found.")
+        return None
+    except Exception as e:
+        print(f"Error reading file {file_path}: {e}")
+        return None
+
+def create_matrix(string):
+    new_matrix = []
+    for linha in string.split("\n"):
+        if linha.strip() == "":
+            continue
+        new_matrix.append([char for char in linha.strip()])
+    return new_matrix

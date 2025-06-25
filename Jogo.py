@@ -12,33 +12,17 @@ from screens import NewPlayerScreen, SaveFilesScreen
 from new_game import NewGame as Mode1NewGame, userInput
 
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 running = True
 dt = 0
 
-def open_file(file_path):
-    try:
-        with open(file_path, "r") as f:
-            return f.read().strip()
-    except FileNotFoundError:
-        print(f"File {file_path} not found.")
-        return None
-    except Exception as e:
-        print(f"Error reading file {file_path}: {e}")
-        return None
 
-def create_matrix(string):
-    new_matrix = []
-    for linha in string.split("\n"):
-        if linha.strip() == "":
-            continue
-        new_matrix.append([char for char in linha.strip()])
-    return new_matrix
+
 
 #see if the 3 save files exist, if not, create one.
 def check_save_file(file_path, index):
@@ -131,16 +115,8 @@ while running:
                 activeScreen = campaignScreen.next_screen
                 campaignScreen.next_screen = None
                 if activeScreen.startswith("fase"):
-                    level_path = settings.level_path + activeScreen + ".txt"
-                    string = open_file(level_path)
-                    matrix = create_matrix(string)
-                    print(f"Loading level {activeScreen} from {level_path}...")
-                    if matrix is None:
-                        #print(f"Error loading level {activeScreen}.")
-                        activeScreen = "campaign"
-                    else:
-                        game = Mode1NewGame(SCREEN_WIDTH, SCREEN_HEIGHT, 1, DEBUG_MODE, matrix)
-                        activeScreen = "game"
+                    game = Mode1NewGame(SCREEN_WIDTH, SCREEN_HEIGHT, 1, DEBUG_MODE, activeScreen)
+                    activeScreen = "game"
 
         case "save_files":
             saveFilesScreen.update(screen, events)
@@ -171,20 +147,33 @@ while running:
                 newLevelScreen.startGame = False
         case "scores":
             scoresScreen.update(screen, events)
+            if scoresScreen.next_screen:
+                activeScreen = scoresScreen.next_screen
+                scoresScreen.next_screen = None
         case "game":
             game.update(dt, screen, events)
             if game.nextScreen:
                 activeScreen = game.nextScreen
                 elapsed_time = game.current_seconds
                 player_score = game.player.points
+
+                is_level = game.is_level
+                level = game.level
+                matrix = game.matrix
+
+                if(is_level):
+                    matrix = level
+
                 game = None
                 if(activeScreen == "win"):
-                    winScreen = WinScreen(SCREEN_WIDTH, SCREEN_HEIGHT, elapsed_time, player_score)
+                    winScreen = WinScreen(SCREEN_WIDTH, SCREEN_HEIGHT, elapsed_time, player_score, matrix)
         case "win":
             winScreen.update(screen, events)
             if winScreen.next_screen:
                 activeScreen = winScreen.next_screen
                 winScreen = None
+                if(activeScreen != "quit"): #TELA DE QUIT NN EXISTE AINDA
+                    campaignScreen.recarregar_botoes()
         case "reload":
             #reload this entire file
             print("Reloading game...")

@@ -30,3 +30,9 @@ class TextBox:
         
     def set_text(self, text):
         self.text = text
+
+    def get_rect(self):
+        return pygame.Rect(self.position[0], self.position[1], self.size[0], self.size[1])
+
+    def get_text_surface(self):
+        return self.font.render(self.text, True, self.text_color)

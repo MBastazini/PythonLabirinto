@@ -120,6 +120,11 @@ class SaveFilesScreen:
         with open(file_path, 'w') as f:
             f.write("0\n")
         
+        #delete player scores
+        scores_file_path = settings.saves_path[file_index]
+        if os.path.exists(scores_file_path):
+            os.remove(scores_file_path)
+        
         settings.save_files[file_index][0] = False
         settings.save_files[file_index][1] = None
         self.next_screen = 'reload'

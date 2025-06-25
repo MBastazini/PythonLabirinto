@@ -53,14 +53,13 @@ def newMaze(size):
     geraLabirintoRecursivo(matriz, start_x, start_y)
     return matriz
 
-def generateWallList(level_difficulty, SCREEN_WIDTH=600, SCREEN_HEIGHT=600, debug_mode=False, custom_maze=None):
+def generateWallList(SCREEN_WIDTH=600, SCREEN_HEIGHT=600, debug_mode=False, custom_maze=None):
     if custom_maze:
         # If a custom maze is provided, use it directly
         matriz = custom_maze
     else:
-        matriz = newMaze(23 + (
-                level_difficulty * 4 * 3
-            )) #multiplos de 4 (o 3 é a escala com que as dificuldades aumentam)
+        print("Error: Matriz do labritinto não foi passada.")
+        return []
 
     classWallList = []
 
